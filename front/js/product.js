@@ -20,49 +20,49 @@ fetch("http://localhost:3000/api/products/",  {method : "GET"})
     {
 
         if (product._id == urlId){
-        let eltArticle = document.createElement('article')
+        //let eltArticle = document.createElement('article');
         
 
-        let eltImg = document.createElement ('img')
+        let eltImg = document.createElement ('img');
         eltImg.src = product.imageUrl
         eltImg.alt = product.altTxt
-        eltImg.classList.add ('item__img') 
-        document.getElementsByClassName('item__img')[0].appendChild(eltImg)
+        eltImg.classList.add ('item__img') ;
+        document.getElementsByClassName('item__img')[0].appendChild(eltImg);
         console.log(eltImg)
   
   
-        let eltProdName = document.createElement('h1')
-        eltProdName.setAttribute('id','title') 
+        let eltProdName = document.createElement('h1');
+        eltProdName.setAttribute('id','title') ;
         eltProdName.textContent = product.name
-        document.getElementById('title').appendChild(eltProdName)
+        document.getElementById('title').appendChild(eltProdName);
         console.log(eltProdName)
         
 
-        let eltPrice = document.createElement('span')
-        eltPrice.setAttribute('id','price')
+        let eltPrice = document.createElement('span');
+        eltPrice.setAttribute('id','price');
         eltPrice.textContent = product.price
-        document.getElementById('price').appendChild(eltPrice)
+        document.getElementById('price').appendChild(eltPrice);
         console.log(eltPrice)
         
   
-        let eltProdDesc = document.createElement('p')
-        eltProdDesc.setAttribute('id','description')
+        let eltProdDesc = document.createElement('p');
+        eltProdDesc.setAttribute('id','description');
         eltProdDesc.textContent = product.description
-        document.getElementById('description').appendChild(eltProdDesc)
+        document.getElementById('description').appendChild(eltProdDesc);
         console.log(eltProdDesc)
 
        //
             
             for (color of product.colors){
-                let option = document.createElement('option')
-                let eltColor = document.createElement('colors')
-                eltColor.setAttribute('id','colors')
-                document.getElementById('colors').appendChild(option)
+                let option = document.createElement('option');
+                let eltColor = document.createElement('colors');
+                eltColor.setAttribute('id','colors');
+                document.getElementById('colors').appendChild(option);
                 option.appendChild(eltColor)
                 console.log(eltColor)
             
-            for (let i=0; i>=1; i++){
-                eltColor = eltColor.product.value
+            for (let i=0; i<= product.colors.length; i++){
+                console.log(eltColor)
             }}
         } 
     };
