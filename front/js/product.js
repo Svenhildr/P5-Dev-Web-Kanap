@@ -51,19 +51,20 @@ fetch("http://localhost:3000/api/products/",  {method : "GET"})
         document.getElementById('description').appendChild(eltProdDesc);
         console.log(eltProdDesc)
 
-       //
-            
-            for (color of product.colors){
-                let option = document.createElement('option');
-                let eltColor = document.createElement('colors');
-                eltColor.setAttribute('id','colors');
-                document.getElementById('colors').appendChild(option);
-                option.appendChild(eltColor)
-                console.log(eltColor)
-            
-            for (let i=0; i<= product.colors.length; i++){
-                console.log(eltColor)
-            }}
+        let color = document.getElementById("colors");
+      for (i = 0; i < products.colors.length; i++) {
+        color.innerHTML += `<option value="${products.colors[i]}">${products.colors[i]}</option>`;
+
+
+           
         } 
-    };
-})
+        };
+
+    
+    }})
+    function colorValue() {
+        let color = document.getElementById("colors");
+        return color.value;
+    }
+ 
+   
