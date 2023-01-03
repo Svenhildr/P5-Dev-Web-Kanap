@@ -31,6 +31,9 @@ fetch(`http://localhost:3000/api/products/`)
 
       const eltArticle = document.createElement("article");
       eltArticle.classList.add("cart__item");
+      eltArticle.dataset.id = product.id;
+      eltArticle.dataset.color = product.color;
+      console.log(eltArticle);
       eltSection.appendChild(eltArticle);
 
       const divImg = document.createElement("div");
@@ -90,12 +93,12 @@ fetch(`http://localhost:3000/api/products/`)
 
       let eltQuantity = document.createElement("input");
       let eltValue = document.createElement("value");
-      eltQuantity.type = Number;
+      eltQuantity.type = "Number";
       eltQuantity.className = "itemQuantity";
       eltQuantity.textContent = product.quantity;
       eltQuantity.value = product.quantity;
       divQuantity.appendChild(eltQuantity);
-      minMax(eltQuantity);
+      //minMax(eltQuantity);
 
       let divDelete = document.createElement("div");
       divDelete.classList.add("cart__item__content__settings__delete");
@@ -106,17 +109,59 @@ fetch(`http://localhost:3000/api/products/`)
       pDeleteItem.textContent = "Supprimer";
       divDelete.appendChild(pDeleteItem);
 
-      //appelle la fonction
-      let total = calculQuantityAndPrice(cart);
-      console.log(total);
+      //faire eventlistener sur HTML "supprimer"
 
-      //insère les calculs de total de prix et de quantité dans l'HTML
+      pDeleteItem.addEventListener("click", function (e) {
+        console.log("c'est cliqué", e, e.target.closest("article"));
+        let res = confirm("supprimer");
+        let article = e.target.closest("article");
+        // Récupérer l'ID et la couleur de l'article cliqué
+        let articleId = article.getAttribute("data-id");
+        let articleColor = article.getAttribute("data-color");
+        let panier = [];
+        if (res) {
+          /*  const id = article.dataset.id;
+          const color = article.dataset.color; */
+          let cartLocal = localStorage.getItem("cart");
+          cartLocalJson = JSON.parse(cartLocal);
+          // Trouver l'index de l'objet à supprimer dans le tableau
+          const index = cartLocalJson.findIndex(
+            (item) => item.id === articleId && item.color === articleColor
+          );
+          console.log(index);
+          // Supprimer l'objet du tableau
+          cartLocalJson.splice(index, 1);
+          localStorage.setItem("cart", JSON.stringify(cartLocalJson));
+          article.remove();
+          // Recharger la page
+          calculQuantityAndPrice(cartLocalJson);
+        } else {
+          // Annuler l'action de suppression
+          alert("Suppression annulée");
+        }
+        console.log(res);
+      });
 
-      const eltTotalItems = document.getElementById("totalQuantity");
-      eltTotalItems.textContent = total[1];
-      const eltTotalPrice = document.getElementById("totalPrice");
-      eltTotalPrice.textContent = total[0];
+      eltQuantity.addEventListener("change", function () {
+        console.log("c'est changé");
+      });
+
+      //Modifier le localStorage
+      // let panier = []
+      // panier.push({
+      //   id : product.id
+      // })
+      // let cartLocal = localStorage.getItem("cart");
+      // cartLocal = JSON.parse(cartLocal);
+
+      //Relancer calcule price
+      //});
+
+      //Modifier quantity
     }
+
+    //appelle la fonction
+    calculQuantityAndPrice(cart);
 
     //va chercher le calcul des quantité et prix dans la fonction
     //calculQuantityAndPrice(cart);
@@ -124,26 +169,62 @@ fetch(`http://localhost:3000/api/products/`)
 
 //Function Calculer total price et item (Qu'on puisse rappeler et qu'elle fonction Autonome)
 // et qu'on puisse ajouter ou enlever un article avec l'input
-function calculQuantityAndPrice(cart) {
+
+async function calculQuantityAndPrice(cart) {
+  let totalPrice = 0;
+  let totalQuantity = 0;
+  for (const product of cart) {
+    totalQuantity += parseInt(product.quantity);
+  }
+  for (const product of cart) {
+    let price = await fetch(`http://localhost:3000/api/products/` + product.id)
+      .then((data) => {
+        return data.json();
+      })
+      .then((product) => {
+        return product.price;
+      });
+
+    totalPrice += parseInt(price) * parseInt(product.quantity);
+    console.log(totalPrice, totalQuantity);
+  }
+  let total = [totalPrice, totalQuantity];
+
+  //insère les calculs de total de prix et de quantité dans l'HTML
+  const eltTotalItems = document.getElementById("totalQuantity");
+  eltTotalItems.textContent = total[1];
+  const eltTotalPrice = document.getElementById("totalPrice");
+  eltTotalPrice.textContent = total[0];
+}
+
+/* function calculQuantityAndPrice(cart) {
   let totalPrice = 0;
   let totalQuantity = 0;
   for (const product of cart) {
     // console.log(product.price * product.quantity);
-    totalPrice += product.price * product.quantity;
+    totalPrice += parseInt(product.price * product.quantity);
     totalQuantity += parseInt(product.quantity);
   }
   let total = [totalPrice, totalQuantity];
-  return total;
+
+  //insère les calculs de total de prix et de quantité dans l'HTML
+  const eltTotalItems = document.getElementById("totalQuantity");
+  eltTotalItems.textContent = total[1];
+  const eltTotalPrice = document.getElementById("totalPrice");
+  eltTotalPrice.textContent = total[0];
+
+  // return total;
 
   console.log(totalPrice, totalQuantity);
   //Ajouter les informations dans le HTML
-}
+} */
 
-function minMax(value, min, max) {
+/* function minMax(value, min, max) {
   if (parseInt(value) < 1 || isNaN(parseInt(value))) return 1;
   else if (parseInt(value) > 100) return 100;
-  else return value;
+  else return value; 
 }
+*/
 
 //Function delete utiliser const nom = element.closest("cart__item");
 
