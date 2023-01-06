@@ -112,7 +112,7 @@ fetch(`http://localhost:3000/api/products/`)
       pDeleteItem.textContent = "Supprimer";
       divDelete.appendChild(pDeleteItem);
 
-      //faire eventlistener sur HTML "supprimer"
+      // eventlistener sur HTML "supprimer" pour suppression produit
 
       pDeleteItem.addEventListener("click", function (e) {
         let res = confirm("supprimer");
@@ -121,75 +121,83 @@ fetch(`http://localhost:3000/api/products/`)
         // Récupérer l'ID et la couleur de l'article cliqué
         let articleId = article.getAttribute("data-id");
         let articleColor = article.getAttribute("data-color");
+        console.log(articleId, articleColor);
+        //si bouton ok de l'alerte est selectionné
 
         if (res) {
-          let cartLocal = localStorage.getItem("cart");
-          cartLocalJson = JSON.parse(cartLocal);
-
           // Trouver l'index de l'objet à supprimer dans le local storage
-          const index = cartLocalJson.findIndex(
+          const index = cart.findIndex(
             (item) => item.id === articleId && item.color === articleColor
           );
 
-          // Supprimer l'objet du local storage
-          cartLocalJson.splice(index, 1);
-          localStorage.setItem("cart", JSON.stringify(cartLocalJson));
-          article.remove();
+          console.log(index);
 
-          // Recharger la page
-          calculQuantityAndPrice(cartLocalJson);
+          if (index >= 0) {
+            // Supprimer l'objet du local storage
+            cart.splice(index, 1);
+            // console.log(cart);
+            saveCart(cart);
+            article.remove();
+
+            // Recharger la page
+            calculQuantityAndPrice(cart);
+          } else {
+            alert("Erreur suppression");
+          }
+
+          //si bouton annuler de l'alerte est selectionné
         } else {
           // Annuler l'action de suppression
           alert("Suppression annulée");
         }
       });
 
-      eltQuantity.addEventListener("change", function (e) {
-        console.log("c'est changé");
-        let article = e.target.closest("article");
-        console.log(article);
+      // eventlistener sur HTML l'input pour modification quantité produit
+
+      eltQuantity.addEventListener("change", (e) => {
+        product.quantity = eltQuantity.value;
+
+        // Met à jour le prix de l'article
+        eltPrice.textContent = product.price * product.quantity + " €";
+
+        // Met à jour le panier local
+        saveCart(cart);
+
+        //calcul des prix et quantité
+        calculQuantityAndPrice(cart);
       });
-
-      //Modifier le localStorage
-      // let panier = []
-      // panier.push({
-      //   id : product.id
-      // })
-      // let cartLocal = localStorage.getItem("cart");
-      // cartLocal = JSON.parse(cartLocal);
-
-      //Relancer calcule price
-      //});
-
-      //Modifier quantity
     }
 
     //appelle la fonction
     calculQuantityAndPrice(cart);
 
-    //va chercher le calcul des quantité et prix dans la fonction
-    //calculQuantityAndPrice(cart);
+    let form = document.querySelector("form");
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      console.log("form envoyé!");
+    });
+
+    let firstName = document.getElementById("firstName");
+    console.log(firstName);
+    firstName.addEventListener("change", (e) => {
+      console.log("Change" + e.target.value);
+    });
+
+    let orderBtn = document.getElementById("order");
+    orderBtn.addEventListener("click", (e) => {
+      console.log("c'est cliqué!");
+    });
   });
 
 //Function Calculer total price et item (Qu'on puisse rappeler et qu'elle fonction Autonome)
 // et qu'on puisse ajouter ou enlever un article avec l'input
 
-async function calculQuantityAndPrice(cart) {
+function calculQuantityAndPrice(cart) {
   let totalPrice = 0;
   let totalQuantity = 0;
   for (const product of cart) {
     totalQuantity += parseInt(product.quantity);
-  }
-  for (const product of cart) {
-    let price = await fetch(`http://localhost:3000/api/products/` + product.id)
-      .then((data) => {
-        return data.json();
-      })
-      .then((product) => {
-        return product.price;
-      });
-
-    totalPrice += parseInt(price) * parseInt(product.quantity);
+    totalPrice += parseInt(product.price) * parseInt(product.quantity);
   }
   let total = [totalPrice, totalQuantity];
   console.log(totalPrice, totalQuantity);
@@ -201,38 +209,17 @@ async function calculQuantityAndPrice(cart) {
   eltTotalPrice.textContent = total[0];
 }
 
-/* function calculQuantityAndPrice(cart) {
-  let totalPrice = 0;
-  let totalQuantity = 0;
+function saveCart(cart) {
+  let newCart = [];
   for (const product of cart) {
-    // console.log(product.price * product.quantity);
-    totalPrice += parseInt(product.price * product.quantity);
-    totalQuantity += parseInt(product.quantity);
+    newCart.push({
+      id: product.id,
+      color: product.color,
+      quantity: product.quantity,
+    });
   }
-  let total = [totalPrice, totalQuantity];
-
-  //insère les calculs de total de prix et de quantité dans l'HTML
-  const eltTotalItems = document.getElementById("totalQuantity");
-  eltTotalItems.textContent = total[1];
-  const eltTotalPrice = document.getElementById("totalPrice");
-  eltTotalPrice.textContent = total[0];
-
-  // return total;
-
-  console.log(totalPrice, totalQuantity);
-  //Ajouter les informations dans le HTML
-} */
-
-/* function minMax(value, min, max) {
-  if (parseInt(value) < 1 || isNaN(parseInt(value))) return 1;
-  else if (parseInt(value) > 100) return 100;
-  else return value; 
+  localStorage.setItem("cart", JSON.stringify(newCart));
 }
-*/
-
-//Function delete utiliser const nom = element.closest("cart__item");
-
-//Function Modify quantity
 
 //Formulaire Vérifier les champs (Regex)
 
