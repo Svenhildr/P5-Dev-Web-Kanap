@@ -177,103 +177,98 @@ fetch(`http://localhost:3000/api/products/`)
 
        let isFormValid = true; // On suppose que le formulaire est valide par défaut
        */
-  });
 
-//regex formulaire
+    //regex formulaire
 
-const nameRegex =
-  /^[a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+([-'\s][a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+)?$/;
+    const nameRegex =
+      /^[a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+([-'\s][a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+)?$/;
 
-const addressRegex =
-  /^[a-zA-Z0-9àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅåÆæœ\s\,\'\-]*$/;
+    const aR =
+      /^[a-zA-Z0-9àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅåÆæœ\s\,\'\-]*$/;
 
-//code postal + ville
-const cityRegex =
-  /^([0-9]{5}).[a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+([-'\s][a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+)?$/;
+    //code postal + ville
+    const cityRegex =
+      /^([0-9]{5}).[a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+([-'\s][a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+)?$/;
 
-const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
-let isFormValid = false;
+    let isFormValid = false;
 
-//console.log(order, "c'est submit!!!");
+    //console.log(order, "c'est submit!!!");
 
-let firstNameForm = document.getElementById("firstName");
-let lastNameForm = document.getElementById("lastName");
-let addressForm = document.getElementById("address");
-let cityForm = document.getElementById("city");
-let emailForm = document.getElementById("email");
+    let firstNameForm = document.getElementById("firstName");
+    let lastNameForm = document.getElementById("lastName");
+    let addressForm = document.getElementById("address");
+    let cityForm = document.getElementById("city");
+    let emailForm = document.getElementById("email");
 
-const firstNameTest = nameRegex.test(firstNameForm.value);
-const lastNameTest = nameRegex.test(lastNameForm.value);
-const addressTest = addressRegex.test(addressForm.value);
-console.log(addressTest);
-const cityTest = cityRegex.test(cityForm.value);
-const emailTest = emailRegex.test(emailForm.value);
+    firstNameForm.addEventListener("change", (e) => {
+      console.log(e.target.value);
+      if (!nameRegex.test(firstNameForm.value)) {
+        msgError("firstNameErrorMsg");
+        isFormValid = false;
+      } else {
+        isFormValid = true;
+        clearError("firstNameErrorMsg");
+      }
+    });
+    //console.log(firstNameTest);
 
-firstNameForm.addEventListener("change", (e) => {
-  console.log(e.target.value);
-  if (firstNameTest === false) {
-    msgError("firstNameErrorMsg");
-    isFormValid = false;
-  } else {
-    isFormValid = true;
-  }
-});
-//console.log(firstNameTest);
+    // Check last name
+    lastNameForm.addEventListener("change", (e) => {
+      console.log(e.target.value);
+      if (!nameRegex.test(lastNameForm.value)) {
+        msgError("lastNameErrorMsg");
+        isFormValid = false;
+      } else {
+        isFormValid = true;
+        clearError("lastNameErrorMsg");
+      }
+    });
+    //console.log(lastNameTest);
 
-// Check last name
-lastNameForm.addEventListener("change", (e) => {
-  console.log(e.target.value);
-  if (lastNameTest === false) {
-    msgError("lastNameErrorMsg");
-    isFormValid = false;
-  } else {
-    isFormValid = true;
-  }
-});
-//console.log(lastNameTest);
+    // Check address
+    addressForm.addEventListener("change", (e) => {
+      console.log(addressForm.value);
+      if (!aR.test(addressForm.value)) {
+        isFormValid = false;
+        msgError("addressErrorMsg");
+      } else {
+        isFormValid = true;
+        clearError("addressErrorMsg");
+      }
+    });
+    //console.log(addressTest);
 
-// Check address
-addressForm.addEventListener("change", (e) => {
-  console.log(addressForm.value);
-  if (addressTest === false) {
-    isFormValid = false;
-  } else {
-    msgError("addressErrorMsg");
-    isFormValid = true;
-  }
-  console.log(addressTest);
-});
-//console.log(addressTest);
+    // Check city
+    cityForm.addEventListener("change", (e) => {
+      console.log(e.target.value);
+      if (!cityRegex.test(cityForm.value)) {
+        msgError("cityErrorMsg");
+        isFormValid = false;
+      } else {
+        isFormValid = true;
+        clearError("cityErrorMsg");
+      }
+    });
+    //console.log(cityTest);
 
-// Check city
-cityForm.addEventListener("change", (e) => {
-  console.log(e.target.value);
-  if (cityTest === false) {
-    msgError("cityErrorMsg");
-    isFormValid = false;
-  } else {
-    isFormValid = true;
-  }
-});
-//console.log(cityTest);
-
-// Check email
-emailForm.addEventListener("change", (e) => {
-  console.log(e.target.value);
-  if (emailTest === false) {
-    msgError("emailErrorMsg");
-    isFormValid = false;
-  } else {
-    isFormValid = true;
-  }
-});
-//console.log(emailTest);
-
-let button = document.getElementById("order");
-if (isFormValid) {
-  button.addEventListener("submit", (e) => {
-    e.preventDefault();
+    // Check email
+    emailForm.addEventListener("change", (e) => {
+      console.log(e.target.value);
+      if (!emailRegex.test(emailForm.value)) {
+        msgError("emailErrorMsg");
+        isFormValid = false;
+      } else {
+        isFormValid = true;
+        clearError("emailErrorMsg");
+      }
+    });
+    //console.log(emailTest);
+    /* let button = document.getElementById("order");
+button.addEventListener("submit", (e) => {
+  e.stopPropagation(); */
+    /* if (isFormValid) {
     const order = {
       contact: {
         firstName: firstNameForm.value,
@@ -286,26 +281,79 @@ if (isFormValid) {
     };
     console.log(order);
     let cart = JSON.parse(localStorage.getItem("cart"));
-    saveCart(cart);
-  });
-} else {
+    saveCart(cart); */
+    /*   console.log("c'est bon!");
+}); */
+    /* } else {
   // The form is not valid,
   alert("formulaire non valide");
-}
+} */
+    let button = document.getElementById("order");
+    button.addEventListener("click", postForm);
+
+    function postForm(e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      let button = document.getElementById("order");
+      let cart = JSON.parse(localStorage.getItem("cart"));
+      let cartOrder = [];
+      for (let product of cart) {
+        cartOrder.push(product.id);
+      }
+      if (isFormValid) {
+        const order = {
+          contact: {
+            firstName: firstNameForm.value,
+            lastName: lastNameForm.value,
+            address: addressForm.value,
+            city: cityForm.value,
+            email: emailForm.value,
+          },
+          products: cartOrder,
+        };
+        console.log(order);
+
+        saveCart(cart);
+        console.log("c'est ok!");
+      }
+    }
+  });
+
+let responseOrder = await fetch(`http://localhost:3000/api/products/order`, {
+  method: "POST",
+  headers: {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify(order),
+});
 
 //paramétrage du message d'erreur formulaire
 function msgError(location) {
   document.getElementById(location).textContent =
     "Veuillez vérifier votre saisie";
 }
+function clearError(location) {
+  document.getElementById(location).textContent = " ";
+}
 
-function fieldCheck() {
-  if (isFormValid) {
+/* function fieldCheck() {
+  if (
+firstNameForm.value == "" ||
+firstNameTest == false ||
+lastNameForm.value == "" ||
+lastNameTest == false ||
+addressForm.value == "" ||
+addressTest == false ||
+cityForm.value == "" ||
+cityTest == false ||
+emailForm.value == "" ||
+!emailTest) {
     return false;
   } else {
     return true;
   }
-}
+} */
 
 //Function Calculer total price et item (Qu'on puisse rappeler et qu'elle fonction Autonome)
 // et qu'on puisse ajouter ou enlever un article avec l'input
