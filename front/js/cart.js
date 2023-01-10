@@ -18,7 +18,7 @@ fetch(`http://localhost:3000/api/products/`)
         (productItem) => productItem._id === product.id
       );
 
-      //lier les données a nos objets product in cart
+      //lier les données à nos objets product in cart
       product.price = existingProduct.price;
       product.name = existingProduct.name;
       product.imageUrl = existingProduct.imageUrl;
@@ -168,26 +168,144 @@ fetch(`http://localhost:3000/api/products/`)
       });
     }
 
-    //appelle la fonction
+    //calcul des prix et quantité
     calculQuantityAndPrice(cart);
 
-    let form = document.querySelector("form");
+    /*     let form = document.querySelector("form");
     form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      console.log("form envoyé!");
-    });
+       e.preventDefault(); 
 
-    let firstName = document.getElementById("firstName");
-    console.log(firstName);
-    firstName.addEventListener("change", (e) => {
-      console.log("Change" + e.target.value);
-    });
-
-    let orderBtn = document.getElementById("order");
-    orderBtn.addEventListener("click", (e) => {
-      console.log("c'est cliqué!");
-    });
+       let isFormValid = true; // On suppose que le formulaire est valide par défaut
+       */
   });
+
+//regex formulaire
+
+const nameRegex =
+  /^[a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+([-'\s][a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+)?$/;
+
+const addressRegex =
+  /^[a-zA-Z0-9àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅåÆæœ\s\,\'\-]*$/;
+
+//code postal + ville
+const cityRegex =
+  /^([0-9]{5}).[a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+([-'\s][a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+)?$/;
+
+const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+
+let isFormValid = false;
+
+//console.log(order, "c'est submit!!!");
+
+let firstNameForm = document.getElementById("firstName");
+let lastNameForm = document.getElementById("lastName");
+let addressForm = document.getElementById("address");
+let cityForm = document.getElementById("city");
+let emailForm = document.getElementById("email");
+
+const firstNameTest = nameRegex.test(firstNameForm.value);
+const lastNameTest = nameRegex.test(lastNameForm.value);
+const addressTest = addressRegex.test(addressForm.value);
+console.log(addressTest);
+const cityTest = cityRegex.test(cityForm.value);
+const emailTest = emailRegex.test(emailForm.value);
+
+firstNameForm.addEventListener("change", (e) => {
+  console.log(e.target.value);
+  if (firstNameTest === false) {
+    msgError("firstNameErrorMsg");
+    isFormValid = false;
+  } else {
+    isFormValid = true;
+  }
+});
+//console.log(firstNameTest);
+
+// Check last name
+lastNameForm.addEventListener("change", (e) => {
+  console.log(e.target.value);
+  if (lastNameTest === false) {
+    msgError("lastNameErrorMsg");
+    isFormValid = false;
+  } else {
+    isFormValid = true;
+  }
+});
+//console.log(lastNameTest);
+
+// Check address
+addressForm.addEventListener("change", (e) => {
+  console.log(addressForm.value);
+  if (addressTest === false) {
+    isFormValid = false;
+  } else {
+    msgError("addressErrorMsg");
+    isFormValid = true;
+  }
+  console.log(addressTest);
+});
+//console.log(addressTest);
+
+// Check city
+cityForm.addEventListener("change", (e) => {
+  console.log(e.target.value);
+  if (cityTest === false) {
+    msgError("cityErrorMsg");
+    isFormValid = false;
+  } else {
+    isFormValid = true;
+  }
+});
+//console.log(cityTest);
+
+// Check email
+emailForm.addEventListener("change", (e) => {
+  console.log(e.target.value);
+  if (emailTest === false) {
+    msgError("emailErrorMsg");
+    isFormValid = false;
+  } else {
+    isFormValid = true;
+  }
+});
+//console.log(emailTest);
+
+let button = document.getElementById("order");
+if (isFormValid) {
+  button.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const order = {
+      contact: {
+        firstName: firstNameForm.value,
+        lastName: lastNameForm.value,
+        address: addressForm.value,
+        city: cityForm.value,
+        email: emailForm.value,
+      },
+      products: product._id,
+    };
+    console.log(order);
+    let cart = JSON.parse(localStorage.getItem("cart"));
+    saveCart(cart);
+  });
+} else {
+  // The form is not valid,
+  alert("formulaire non valide");
+}
+
+//paramétrage du message d'erreur formulaire
+function msgError(location) {
+  document.getElementById(location).textContent =
+    "Veuillez vérifier votre saisie";
+}
+
+function fieldCheck() {
+  if (isFormValid) {
+    return false;
+  } else {
+    return true;
+  }
+}
 
 //Function Calculer total price et item (Qu'on puisse rappeler et qu'elle fonction Autonome)
 // et qu'on puisse ajouter ou enlever un article avec l'input
@@ -209,6 +327,7 @@ function calculQuantityAndPrice(cart) {
   eltTotalPrice.textContent = total[0];
 }
 
+//permet d'envoyer au local Storage les données sans le prix
 function saveCart(cart) {
   let newCart = [];
   for (const product of cart) {
@@ -221,12 +340,8 @@ function saveCart(cart) {
   localStorage.setItem("cart", JSON.stringify(newCart));
 }
 
-//Formulaire Vérifier les champs (Regex)
+/* function fieldCheck() {
+  return firstNameTest && lastNameTest && addressTest && cityTest && emailTest;
+} */
 
 // Commander : Fetch méthode POST (Revoir parametre api)
-
-/* if (confirm("Press a button!")) {
-  txt = "You pressed OK!";
-} else {
-  txt = "You pressed Cancel!";
-} */

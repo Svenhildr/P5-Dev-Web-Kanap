@@ -9,15 +9,16 @@ fetch(url, { method: "GET" })
     console.log(products);
 
     let HTML = document.getElementById("items");
-
     let myHTML = "";
 
     for (const product of products) {
-      //Créer élements HTML en javascript
+      //Créer élements dans le DOM
 
+      //balise a
       let eltA = document.createElement("a");
       eltA.href = `./product.html?id=${product._id}`;
 
+      //
       let eltArticle = document.createElement("article");
       eltA.appendChild(eltArticle);
 
