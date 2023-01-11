@@ -171,13 +171,6 @@ fetch(`http://localhost:3000/api/products/`)
     //calcul des prix et quantité
     calculQuantityAndPrice(cart);
 
-    /*     let form = document.querySelector("form");
-    form.addEventListener("submit", (e) => {
-       e.preventDefault(); 
-
-       let isFormValid = true; // On suppose que le formulaire est valide par défaut
-       */
-
     //regex formulaire
 
     const nameRegex =
@@ -203,7 +196,7 @@ fetch(`http://localhost:3000/api/products/`)
     let emailForm = document.getElementById("email");
 
     firstNameForm.addEventListener("change", (e) => {
-      console.log(e.target.value);
+      //console.log(e.target.value);
       if (!nameRegex.test(firstNameForm.value)) {
         msgError("firstNameErrorMsg");
         isFormValid = false;
@@ -216,7 +209,7 @@ fetch(`http://localhost:3000/api/products/`)
 
     // Check last name
     lastNameForm.addEventListener("change", (e) => {
-      console.log(e.target.value);
+      // console.log(e.target.value);
       if (!nameRegex.test(lastNameForm.value)) {
         msgError("lastNameErrorMsg");
         isFormValid = false;
@@ -229,7 +222,7 @@ fetch(`http://localhost:3000/api/products/`)
 
     // Check address
     addressForm.addEventListener("change", (e) => {
-      console.log(addressForm.value);
+      //console.log(addressForm.value);
       if (!aR.test(addressForm.value)) {
         isFormValid = false;
         msgError("addressErrorMsg");
@@ -242,7 +235,7 @@ fetch(`http://localhost:3000/api/products/`)
 
     // Check city
     cityForm.addEventListener("change", (e) => {
-      console.log(e.target.value);
+      //console.log(e.target.value);
       if (!cityRegex.test(cityForm.value)) {
         msgError("cityErrorMsg");
         isFormValid = false;
@@ -255,7 +248,7 @@ fetch(`http://localhost:3000/api/products/`)
 
     // Check email
     emailForm.addEventListener("change", (e) => {
-      console.log(e.target.value);
+      //console.log(e.target.value);
       if (!emailRegex.test(emailForm.value)) {
         msgError("emailErrorMsg");
         isFormValid = false;
@@ -264,36 +257,13 @@ fetch(`http://localhost:3000/api/products/`)
         clearError("emailErrorMsg");
       }
     });
-    //console.log(emailTest);
-    /* let button = document.getElementById("order");
-button.addEventListener("submit", (e) => {
-  e.stopPropagation(); */
-    /* if (isFormValid) {
-    const order = {
-      contact: {
-        firstName: firstNameForm.value,
-        lastName: lastNameForm.value,
-        address: addressForm.value,
-        city: cityForm.value,
-        email: emailForm.value,
-      },
-      products: product._id,
-    };
-    console.log(order);
-    let cart = JSON.parse(localStorage.getItem("cart"));
-    saveCart(cart); */
-    /*   console.log("c'est bon!");
-}); */
-    /* } else {
-  // The form is not valid,
-  alert("formulaire non valide");
-} */
+
     let button = document.getElementById("order");
     button.addEventListener("click", postForm);
 
     function postForm(e) {
-      e.preventDefault();
-      e.stopImmediatePropagation();
+      /*  e.preventDefault();
+      e.stopImmediatePropagation(); */
       let button = document.getElementById("order");
       let cart = JSON.parse(localStorage.getItem("cart"));
       let cartOrder = [];
@@ -313,21 +283,27 @@ button.addEventListener("submit", (e) => {
         };
         console.log(order);
 
-        saveCart(cart);
-        console.log("c'est ok!");
+        //saveCart(cart);
+        //console.log("c'est ok!");
+        finalPost(order);
+        e.preventDefault();
       }
     }
+
+    async function finalPost(order) {
+      let response = await fetch("http://localhost:3000/api/products/order", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(order),
+      });
+      let result = await response.json();
+
+      window.location.href = `confirmation.html?id=${result.orderId}`;
+    }
   });
-
-let responseOrder = await fetch(`http://localhost:3000/api/products/order`, {
-  method: "POST",
-  headers: {
-    Accept: "application/json",
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify(order),
-});
-
 //paramétrage du message d'erreur formulaire
 function msgError(location) {
   document.getElementById(location).textContent =
@@ -336,24 +312,6 @@ function msgError(location) {
 function clearError(location) {
   document.getElementById(location).textContent = " ";
 }
-
-/* function fieldCheck() {
-  if (
-firstNameForm.value == "" ||
-firstNameTest == false ||
-lastNameForm.value == "" ||
-lastNameTest == false ||
-addressForm.value == "" ||
-addressTest == false ||
-cityForm.value == "" ||
-cityTest == false ||
-emailForm.value == "" ||
-!emailTest) {
-    return false;
-  } else {
-    return true;
-  }
-} */
 
 //Function Calculer total price et item (Qu'on puisse rappeler et qu'elle fonction Autonome)
 // et qu'on puisse ajouter ou enlever un article avec l'input
@@ -387,9 +345,3 @@ function saveCart(cart) {
   }
   localStorage.setItem("cart", JSON.stringify(newCart));
 }
-
-/* function fieldCheck() {
-  return firstNameTest && lastNameTest && addressTest && cityTest && emailTest;
-} */
-
-// Commander : Fetch méthode POST (Revoir parametre api)
