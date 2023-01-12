@@ -1,7 +1,7 @@
 let cart = localStorage.getItem("cart");
 cart = JSON.parse(cart);
 
-console.log(cart);
+//console.log(cart);
 
 fetch(`http://localhost:3000/api/products/`)
   .then((data) => {
@@ -176,7 +176,7 @@ fetch(`http://localhost:3000/api/products/`)
     const nameRegex =
       /^[a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+([-'\s][a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+)?$/;
 
-    const aR =
+    const addressRegex =
       /^[a-zA-Z0-9àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅåÆæœ\s\,\'\-]*$/;
 
     //code postal + ville
@@ -185,15 +185,18 @@ fetch(`http://localhost:3000/api/products/`)
 
     const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
+    //comme le formulaire n'est pas rempli, on part du principe qu'il est vide
     let isFormValid = false;
 
-    //console.log(order, "c'est submit!!!");
+    //console.log(isFormValid);
 
+    //on récupère les éléments du DOM
     let firstNameForm = document.getElementById("firstName");
     let lastNameForm = document.getElementById("lastName");
     let addressForm = document.getElementById("address");
     let cityForm = document.getElementById("city");
     let emailForm = document.getElementById("email");
+    let form = document.firstNameForm; //et d'afficher (ou retirer) un message d'erreur en cas de syntaxe non valide //ils permettent de faire les tests regex //des eventListener sont mis sur chaque input
 
     firstNameForm.addEventListener("change", (e) => {
       //console.log(e.target.value);
@@ -223,7 +226,7 @@ fetch(`http://localhost:3000/api/products/`)
     // Check address
     addressForm.addEventListener("change", (e) => {
       //console.log(addressForm.value);
-      if (!aR.test(addressForm.value)) {
+      if (!addressRegex.test(addressForm.value)) {
         isFormValid = false;
         msgError("addressErrorMsg");
       } else {
@@ -243,8 +246,8 @@ fetch(`http://localhost:3000/api/products/`)
         isFormValid = true;
         clearError("cityErrorMsg");
       }
+      //console.log(!cityRegex.test(cityForm.value));
     });
-    //console.log(cityTest);
 
     // Check email
     emailForm.addEventListener("change", (e) => {
@@ -258,19 +261,34 @@ fetch(`http://localhost:3000/api/products/`)
       }
     });
 
+    if (cart.length === 0) {
+      isFormValid = false;
+      alert("votre panier est vide");
+      return;
+      //display error message
+    } else {
+    }
+
+    //récupère le bouton dans le DOM et fait un eventListener au click
+
     let button = document.getElementById("order");
     button.addEventListener("click", postForm);
 
+    //la fonction permet de récupérer les articles dans le localStorage,
+    // de créer un array de 2 objets, si le formulaire est valide, qui comprendra :
+    //les données contenues dans le formulaire
+    // les id des produits commandés
+
     function postForm(e) {
-      /*  e.preventDefault();
-      e.stopImmediatePropagation(); */
-      let button = document.getElementById("order");
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      //let button = document.getElementById("order");
       let cart = JSON.parse(localStorage.getItem("cart"));
       let cartOrder = [];
       for (let product of cart) {
         cartOrder.push(product.id);
       }
-      if (isFormValid) {
+      if (isFormValid === true) {
         const order = {
           contact: {
             firstName: firstNameForm.value,
@@ -281,14 +299,16 @@ fetch(`http://localhost:3000/api/products/`)
           },
           products: cartOrder,
         };
-        console.log(order);
 
-        //saveCart(cart);
-        //console.log("c'est ok!");
         finalPost(order);
-        e.preventDefault();
+        //console.log(order);
+      } else {
+        alert("Formulaire non valide");
       }
     }
+
+    //requete POST pour récupérer l'id de la commande, et rediriger sur la page condirmation
+    //la page confirmation contient l'id de la commande dans l'URL
 
     async function finalPost(order) {
       let response = await fetch("http://localhost:3000/api/products/order", {
@@ -300,7 +320,6 @@ fetch(`http://localhost:3000/api/products/`)
         body: JSON.stringify(order),
       });
       let result = await response.json();
-
       window.location.href = `confirmation.html?id=${result.orderId}`;
     }
   });
@@ -324,7 +343,7 @@ function calculQuantityAndPrice(cart) {
     totalPrice += parseInt(product.price) * parseInt(product.quantity);
   }
   let total = [totalPrice, totalQuantity];
-  console.log(totalPrice, totalQuantity);
+  //console.log(totalPrice, totalQuantity);
 
   //insère les calculs de total de prix et de quantité dans l'HTML
   const eltTotalItems = document.getElementById("totalQuantity");

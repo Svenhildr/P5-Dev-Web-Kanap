@@ -1,4 +1,4 @@
-/* page associée à id dans l'API */
+//récupère l'id du produit selectionné dans l'url pour pouvoir ensuite utiliser cet id
 
 let url = new URL(window.location.href);
 let product_id = url.searchParams.get("id");
