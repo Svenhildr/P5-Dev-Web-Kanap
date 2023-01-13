@@ -10,166 +10,170 @@ fetch(`http://localhost:3000/api/products/`)
   .then((products) => {
     //console.log(products);
 
-    //Merger les données, récupere les données des produits
-    for (const product of cart) {
-      // console.log(product);
+    if (cart) {
+      //Merger les données, récupere les données des produits
+      for (const product of cart) {
+        // console.log(product);
 
-      let existingProduct = products.find(
-        (productItem) => productItem._id === product.id
-      );
+        let existingProduct = products.find(
+          (productItem) => productItem._id === product.id
+        );
 
-      //lier les données à nos objets product in cart
-      product.price = existingProduct.price;
-      product.name = existingProduct.name;
-      product.imageUrl = existingProduct.imageUrl;
+        //lier les données à nos objets product in cart
+        product.price = existingProduct.price;
+        product.name = existingProduct.name;
+        product.imageUrl = existingProduct.imageUrl;
 
-      //console.log(existingProduct);
+        //console.log(existingProduct);
 
-      //Affiche les produits (createElement)
-      // section, article, div
+        //Affiche les produits (createElement)
+        // section, article, div
 
-      const eltSection = document.getElementById("cart__items");
+        const eltSection = document.getElementById("cart__items");
 
-      const eltArticle = document.createElement("article");
-      eltArticle.classList.add("cart__item");
-      eltArticle.dataset.id = product.id;
-      eltArticle.dataset.color = product.color;
-      eltSection.appendChild(eltArticle);
+        const eltArticle = document.createElement("article");
+        eltArticle.classList.add("cart__item");
+        eltArticle.dataset.id = product.id;
+        eltArticle.dataset.color = product.color;
+        eltSection.appendChild(eltArticle);
 
-      const divImg = document.createElement("div");
-      divImg.classList.add("cart__item__img");
-      eltArticle.appendChild(divImg);
+        const divImg = document.createElement("div");
+        divImg.classList.add("cart__item__img");
+        eltArticle.appendChild(divImg);
 
-      //image
+        //image
 
-      const eltImg = document.createElement("img");
-      eltImg.src = existingProduct.imageUrl;
-      eltImg.alt = existingProduct.altTxt;
-      divImg.appendChild(eltImg);
+        const eltImg = document.createElement("img");
+        eltImg.src = existingProduct.imageUrl;
+        eltImg.alt = existingProduct.altTxt;
+        divImg.appendChild(eltImg);
 
-      //div
+        //div
 
-      let divContent = document.createElement("div");
-      divContent.classList.add("cart__item__content");
-      eltArticle.appendChild(divContent);
+        let divContent = document.createElement("div");
+        divContent.classList.add("cart__item__content");
+        eltArticle.appendChild(divContent);
 
-      let divDescription = document.createElement("div");
-      divDescription.classList.add("cart__item__content__description");
-      divContent.appendChild(divDescription);
+        let divDescription = document.createElement("div");
+        divDescription.classList.add("cart__item__content__description");
+        divContent.appendChild(divDescription);
 
-      //nom
+        //nom
 
-      let eltName = document.createElement("h2");
-      eltName.textContent = existingProduct.name;
-      divDescription.appendChild(eltName);
+        let eltName = document.createElement("h2");
+        eltName.textContent = existingProduct.name;
+        divDescription.appendChild(eltName);
 
-      //couleur
+        //couleur
 
-      let eltItemColor = document.createElement("p");
-      eltItemColor.textContent = product.color;
-      divDescription.appendChild(eltItemColor);
+        let eltItemColor = document.createElement("p");
+        eltItemColor.textContent = product.color;
+        divDescription.appendChild(eltItemColor);
 
-      //prix
+        //prix
 
-      let eltPrice = document.createElement("p");
-      eltPrice.textContent = product.price * product.quantity + " €";
-      divDescription.appendChild(eltPrice);
-
-      //div
-
-      let divSettings = document.createElement("div");
-      divSettings.classList.add("cart__item__content__settings");
-      divContent.appendChild(divSettings);
-
-      let divQuantity = document.createElement("div");
-      divQuantity.classList.add("cart__item__content__settings__quantity");
-      divSettings.appendChild(divQuantity);
-
-      //quantité
-
-      let pQty = document.createElement("p");
-      pQty.textContent = "Qté : ";
-      divQuantity.appendChild(pQty);
-
-      //input
-
-      let eltQuantity = document.createElement("input");
-      let eltValue = document.createElement("value");
-      eltQuantity.type = "Number";
-      eltQuantity.className = "itemQuantity";
-      eltQuantity.setAttribute("name", "itemQuantity");
-      eltQuantity.setAttribute("min", "1");
-      eltQuantity.setAttribute("max", "100");
-      eltQuantity.setAttribute("value", product.quantity);
-      divQuantity.appendChild(eltQuantity);
-
-      let divDelete = document.createElement("div");
-      divDelete.classList.add("cart__item__content__settings__delete");
-      divSettings.appendChild(divDelete);
-
-      let pDeleteItem = document.createElement("p");
-      pDeleteItem.classList.add("deleteItem");
-      pDeleteItem.textContent = "Supprimer";
-      divDelete.appendChild(pDeleteItem);
-
-      // eventlistener sur HTML "supprimer" pour suppression produit
-
-      pDeleteItem.addEventListener("click", function (e) {
-        let res = confirm("supprimer");
-        let article = e.target.closest("article");
-
-        // Récupérer l'ID et la couleur de l'article cliqué
-        let articleId = article.getAttribute("data-id");
-        let articleColor = article.getAttribute("data-color");
-        console.log(articleId, articleColor);
-        //si bouton ok de l'alerte est selectionné
-
-        if (res) {
-          // Trouver l'index de l'objet à supprimer dans le local storage
-          const index = cart.findIndex(
-            (item) => item.id === articleId && item.color === articleColor
-          );
-
-          console.log(index);
-
-          if (index >= 0) {
-            // Supprimer l'objet du local storage
-            cart.splice(index, 1);
-            // console.log(cart);
-            saveCart(cart);
-            article.remove();
-
-            // Recharger la page
-            calculQuantityAndPrice(cart);
-          } else {
-            alert("Erreur suppression");
-          }
-
-          //si bouton annuler de l'alerte est selectionné
-        } else {
-          // Annuler l'action de suppression
-          alert("Suppression annulée");
-        }
-      });
-
-      // eventlistener sur HTML l'input pour modification quantité produit
-
-      eltQuantity.addEventListener("change", (e) => {
-        product.quantity = eltQuantity.value;
-
-        // Met à jour le prix de l'article
+        let eltPrice = document.createElement("p");
         eltPrice.textContent = product.price * product.quantity + " €";
+        divDescription.appendChild(eltPrice);
 
-        // Met à jour le panier local
-        saveCart(cart);
+        //div
 
-        //calcul des prix et quantité
-        calculQuantityAndPrice(cart);
-      });
+        let divSettings = document.createElement("div");
+        divSettings.classList.add("cart__item__content__settings");
+        divContent.appendChild(divSettings);
+
+        let divQuantity = document.createElement("div");
+        divQuantity.classList.add("cart__item__content__settings__quantity");
+        divSettings.appendChild(divQuantity);
+
+        //quantité
+
+        let pQty = document.createElement("p");
+        pQty.textContent = "Qté : ";
+        divQuantity.appendChild(pQty);
+
+        //input
+
+        let eltQuantity = document.createElement("input");
+        let eltValue = document.createElement("value");
+        eltQuantity.type = "Number";
+        eltQuantity.className = "itemQuantity";
+        eltQuantity.setAttribute("name", "itemQuantity");
+        eltQuantity.setAttribute("min", "1");
+        eltQuantity.setAttribute("max", "100");
+        eltQuantity.setAttribute("value", product.quantity);
+        divQuantity.appendChild(eltQuantity);
+
+        let divDelete = document.createElement("div");
+        divDelete.classList.add("cart__item__content__settings__delete");
+        divSettings.appendChild(divDelete);
+
+        let pDeleteItem = document.createElement("p");
+        pDeleteItem.classList.add("deleteItem");
+        pDeleteItem.textContent = "Supprimer";
+        divDelete.appendChild(pDeleteItem);
+
+        // eventlistener sur HTML "supprimer" pour suppression produit
+
+        pDeleteItem.addEventListener("click", function (e) {
+          let res = confirm("supprimer");
+          let article = e.target.closest("article");
+
+          // Récupérer l'ID et la couleur de l'article cliqué
+          let articleId = article.getAttribute("data-id");
+          let articleColor = article.getAttribute("data-color");
+          console.log(articleId, articleColor);
+          //si bouton ok de l'alerte est selectionné
+
+          if (res) {
+            // Trouver l'index de l'objet à supprimer dans le local storage
+            const index = cart.findIndex(
+              (item) => item.id === articleId && item.color === articleColor
+            );
+
+            console.log(index);
+
+            if (index >= 0) {
+              // Supprimer l'objet du local storage
+              cart.splice(index, 1);
+              // console.log(cart);
+              saveCart(cart);
+              article.remove();
+
+              // Recharger la page
+              calculQuantityAndPrice(cart);
+            } else {
+              alert("Erreur suppression");
+            }
+
+            //si bouton annuler de l'alerte est selectionné
+          } else {
+            // Annuler l'action de suppression
+            alert("Suppression annulée");
+          }
+        });
+
+        // eventlistener sur HTML l'input pour modification quantité produit
+
+        eltQuantity.addEventListener("change", (e) => {
+          product.quantity = eltQuantity.value;
+
+          // Met à jour le prix de l'article
+          eltPrice.textContent = product.price * product.quantity + " €";
+
+          // Met à jour le panier local
+          saveCart(cart);
+
+          //calcul des prix et quantité
+          calculQuantityAndPrice(cart);
+        });
+      }
+
+      //calcul des prix et quantité
+      calculQuantityAndPrice(cart);
+    } else {
+      alert("votre panier est vide");
     }
-
-    //calcul des prix et quantité
-    calculQuantityAndPrice(cart);
 
     //regex formulaire
 
@@ -188,107 +192,82 @@ fetch(`http://localhost:3000/api/products/`)
     //comme le formulaire n'est pas rempli, on part du principe qu'il est vide
     let isFormValid = false;
 
-    //console.log(isFormValid);
-
     //on récupère les éléments du DOM
     let firstNameForm = document.getElementById("firstName");
     let lastNameForm = document.getElementById("lastName");
     let addressForm = document.getElementById("address");
     let cityForm = document.getElementById("city");
     let emailForm = document.getElementById("email");
-    let form = document.firstNameForm; //et d'afficher (ou retirer) un message d'erreur en cas de syntaxe non valide //ils permettent de faire les tests regex //des eventListener sont mis sur chaque input
 
+    // Vérifie le prénom
     firstNameForm.addEventListener("change", (e) => {
-      //console.log(e.target.value);
-      if (!nameRegex.test(firstNameForm.value)) {
-        msgError("firstNameErrorMsg");
-        isFormValid = false;
-      } else {
-        isFormValid = true;
-        clearError("firstNameErrorMsg");
-      }
+      textInput(nameRegex, firstNameForm.value, "firstNameErrorMsg");
     });
-    //console.log(firstNameTest);
 
-    // Check last name
+    // Vérifie nom de famille
     lastNameForm.addEventListener("change", (e) => {
-      // console.log(e.target.value);
-      if (!nameRegex.test(lastNameForm.value)) {
-        msgError("lastNameErrorMsg");
-        isFormValid = false;
-      } else {
-        isFormValid = true;
-        clearError("lastNameErrorMsg");
-      }
+      textInput(nameRegex, lastNameForm.value, "lastNameErrorMsg");
     });
-    //console.log(lastNameTest);
 
-    // Check address
+    // Vérifie l'addresse
     addressForm.addEventListener("change", (e) => {
-      //console.log(addressForm.value);
-      if (!addressRegex.test(addressForm.value)) {
-        isFormValid = false;
-        msgError("addressErrorMsg");
-      } else {
-        isFormValid = true;
-        clearError("addressErrorMsg");
-      }
+      textInput(addressRegex, addressForm.value, "addressErrorMsg");
     });
-    //console.log(addressTest);
 
-    // Check city
+    // Vérifie le code postal et la ville
     cityForm.addEventListener("change", (e) => {
-      //console.log(e.target.value);
-      if (!cityRegex.test(cityForm.value)) {
-        msgError("cityErrorMsg");
-        isFormValid = false;
-      } else {
-        isFormValid = true;
-        clearError("cityErrorMsg");
-      }
-      //console.log(!cityRegex.test(cityForm.value));
+      textInput(cityRegex, cityForm.value, "cityErrorMsg");
     });
 
-    // Check email
+    // Vérifie l'email
     emailForm.addEventListener("change", (e) => {
-      //console.log(e.target.value);
-      if (!emailRegex.test(emailForm.value)) {
-        msgError("emailErrorMsg");
-        isFormValid = false;
-      } else {
-        isFormValid = true;
-        clearError("emailErrorMsg");
-      }
+      textInput(emailRegex, emailForm.value, "emailErrorMsg");
     });
-
-    if (cart.length === 0) {
-      isFormValid = false;
-      alert("votre panier est vide");
-      return;
-      //display error message
-    } else {
-    }
 
     //récupère le bouton dans le DOM et fait un eventListener au click
-
     let button = document.getElementById("order");
     button.addEventListener("click", postForm);
+
+    //contrôle des paramètres regex, valeur et messages d'erreur pour valider un champs
+    function textInput(regex, value, idError) {
+      if (!regex.test(value)) {
+        msgError(idError);
+        return false;
+      } else {
+        clearError(idError);
+        return true;
+      }
+    }
 
     //la fonction permet de récupérer les articles dans le localStorage,
     // de créer un array de 2 objets, si le formulaire est valide, qui comprendra :
     //les données contenues dans le formulaire
     // les id des produits commandés
-
     function postForm(e) {
       e.preventDefault();
       e.stopImmediatePropagation();
       //let button = document.getElementById("order");
       let cart = JSON.parse(localStorage.getItem("cart"));
-      let cartOrder = [];
-      for (let product of cart) {
-        cartOrder.push(product.id);
+
+      //si le panier est vide le formulaire ne sera pas valide et affiche un message
+      if (!cart) {
+        isFormValid = false;
+        return;
       }
-      if (isFormValid === true) {
+
+      if (
+        textInput(nameRegex, firstNameForm.value, "firstNameErrorMsg") &&
+        textInput(nameRegex, lastNameForm.value, "lastNameErrorMsg") &&
+        textInput(addressRegex, addressForm.value, "addressErrorMsg") &&
+        textInput(cityRegex, cityForm.value, "cityErrorMsg") &&
+        textInput(emailRegex, emailForm.value, "emailErrorMsg") &&
+        isFormValid === true
+      ) {
+        let cartOrder = [];
+        for (let product of cart) {
+          cartOrder.push(product.id);
+        }
+
         const order = {
           contact: {
             firstName: firstNameForm.value,
@@ -302,27 +281,43 @@ fetch(`http://localhost:3000/api/products/`)
 
         finalPost(order);
         //console.log(order);
-      } else {
+      } else if (
+        textInput(nameRegex, firstNameForm.value, "firstNameErrorMsg") &&
+        textInput(nameRegex, lastNameForm.value, "lastNameErrorMsg") &&
+        textInput(addressRegex, addressForm.value, "addressErrorMsg") &&
+        textInput(cityRegex, cityForm.value, "cityErrorMsg") &&
+        textInput(emailRegex, emailForm.value, "emailErrorMsg") &&
+        !isFormValid
+      ) {
+        alert("votre panier est vide");
+      } else if (
+        textInput(nameRegex, firstNameForm.value, "firstNameErrorMsg") ||
+        textInput(nameRegex, lastNameForm.value, "lastNameErrorMsg") ||
+        textInput(addressRegex, addressForm.value, "addressErrorMsg") ||
+        textInput(cityRegex, cityForm.value, "cityErrorMsg") ||
+        textInput(emailRegex, emailForm.value, "emailErrorMsg") ||
+        !isFormValid
+      ) {
         alert("Formulaire non valide");
       }
     }
-
-    //requete POST pour récupérer l'id de la commande, et rediriger sur la page condirmation
-    //la page confirmation contient l'id de la commande dans l'URL
-
-    async function finalPost(order) {
-      let response = await fetch("http://localhost:3000/api/products/order", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(order),
-      });
-      let result = await response.json();
-      window.location.href = `confirmation.html?id=${result.orderId}`;
-    }
   });
+
+//requete POST pour récupérer l'id de la commande, et rediriger sur la page condirmation
+//la page confirmation contient l'id de la commande dans l'URL
+async function finalPost(order) {
+  let response = await fetch("http://localhost:3000/api/products/order", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(order),
+  });
+  let result = await response.json();
+  window.location.href = `confirmation.html?id=${result.orderId}`;
+}
+
 //paramétrage du message d'erreur formulaire
 function msgError(location) {
   document.getElementById(location).textContent =
@@ -334,7 +329,6 @@ function clearError(location) {
 
 //Function Calculer total price et item (Qu'on puisse rappeler et qu'elle fonction Autonome)
 // et qu'on puisse ajouter ou enlever un article avec l'input
-
 function calculQuantityAndPrice(cart) {
   let totalPrice = 0;
   let totalQuantity = 0;
@@ -343,7 +337,6 @@ function calculQuantityAndPrice(cart) {
     totalPrice += parseInt(product.price) * parseInt(product.quantity);
   }
   let total = [totalPrice, totalQuantity];
-  //console.log(totalPrice, totalQuantity);
 
   //insère les calculs de total de prix et de quantité dans l'HTML
   const eltTotalItems = document.getElementById("totalQuantity");
