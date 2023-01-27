@@ -122,7 +122,6 @@ fetch(`http://localhost:3000/api/products/`)
           // Récupérer l'ID et la couleur de l'article cliqué
           let articleId = article.getAttribute("data-id");
           let articleColor = article.getAttribute("data-color");
-          console.log(articleId, articleColor);
           //si bouton ok de l'alerte est selectionné
 
           if (res) {
@@ -131,23 +130,21 @@ fetch(`http://localhost:3000/api/products/`)
               (item) => item.id === articleId && item.color === articleColor
             );
 
-            console.log(index);
-
             if (index >= 0) {
               // Supprimer l'objet du local storage
               cart.splice(index, 1);
-              // console.log(cart);
               saveCart(cart);
               article.remove();
 
               // Recharger la page
               calculQuantityAndPrice(cart);
+
+              //en cas d'erreur
             } else {
               alert("Erreur suppression");
             }
-
-            //si bouton annuler de l'alerte est selectionné
           } else {
+            //si le bouton annuler de l'alerte est selectionné
             // Annuler l'action de suppression
             alert("Suppression annulée");
           }
@@ -190,7 +187,7 @@ fetch(`http://localhost:3000/api/products/`)
     const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
     //comme le formulaire n'est pas rempli, on part du principe qu'il est vide
-    let isFormValid = false;
+    // let isFormValid = false;
 
     //on récupère les éléments du DOM
     let firstNameForm = document.getElementById("firstName");
@@ -239,6 +236,20 @@ fetch(`http://localhost:3000/api/products/`)
       }
     }
 
+    function testAllInput() {
+      if (
+        textInput(nameRegex, firstNameForm.value, "firstNameErrorMsg") &&
+        textInput(nameRegex, lastNameForm.value, "lastNameErrorMsg") &&
+        textInput(addressRegex, addressForm.value, "addressErrorMsg") &&
+        textInput(cityRegex, cityForm.value, "cityErrorMsg") &&
+        textInput(emailRegex, emailForm.value, "emailErrorMsg")
+      ) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
     //la fonction permet de récupérer les articles dans le localStorage,
     // de créer un array de 2 objets, si le formulaire est valide, qui comprendra :
     //les données contenues dans le formulaire
@@ -250,55 +261,33 @@ fetch(`http://localhost:3000/api/products/`)
       let cart = JSON.parse(localStorage.getItem("cart"));
 
       //si le panier est vide le formulaire ne sera pas valide et affiche un message
-      if (!cart) {
-        isFormValid = false;
-        return;
-      }
-
-      if (
-        textInput(nameRegex, firstNameForm.value, "firstNameErrorMsg") &&
-        textInput(nameRegex, lastNameForm.value, "lastNameErrorMsg") &&
-        textInput(addressRegex, addressForm.value, "addressErrorMsg") &&
-        textInput(cityRegex, cityForm.value, "cityErrorMsg") &&
-        textInput(emailRegex, emailForm.value, "emailErrorMsg") &&
-        isFormValid === true
-      ) {
-        let cartOrder = [];
-        for (let product of cart) {
-          cartOrder.push(product.id);
-        }
-
-        const order = {
-          contact: {
-            firstName: firstNameForm.value,
-            lastName: lastNameForm.value,
-            address: addressForm.value,
-            city: cityForm.value,
-            email: emailForm.value,
-          },
-          products: cartOrder,
-        };
-
-        finalPost(order);
-        //console.log(order);
-      } else if (
-        textInput(nameRegex, firstNameForm.value, "firstNameErrorMsg") &&
-        textInput(nameRegex, lastNameForm.value, "lastNameErrorMsg") &&
-        textInput(addressRegex, addressForm.value, "addressErrorMsg") &&
-        textInput(cityRegex, cityForm.value, "cityErrorMsg") &&
-        textInput(emailRegex, emailForm.value, "emailErrorMsg") &&
-        !isFormValid
-      ) {
+      if (!cart || cart.length == 0) {
+        // isFormValid = false;
         alert("votre panier est vide");
-      } else if (
-        textInput(nameRegex, firstNameForm.value, "firstNameErrorMsg") ||
-        textInput(nameRegex, lastNameForm.value, "lastNameErrorMsg") ||
-        textInput(addressRegex, addressForm.value, "addressErrorMsg") ||
-        textInput(cityRegex, cityForm.value, "cityErrorMsg") ||
-        textInput(emailRegex, emailForm.value, "emailErrorMsg") ||
-        !isFormValid
-      ) {
-        alert("Formulaire non valide");
+        return;
+      } else {
+        if (testAllInput()) {
+          let cartOrder = [];
+          for (let product of cart) {
+            cartOrder.push(product.id);
+          }
+
+          const order = {
+            contact: {
+              firstName: firstNameForm.value,
+              lastName: lastNameForm.value,
+              address: addressForm.value,
+              city: cityForm.value,
+              email: emailForm.value,
+            },
+            products: cartOrder,
+          };
+
+          finalPost(order);
+          //console.log(order);
+        } else {
+          alert("Formulaire non valide");
+        }
       }
     }
   });
