@@ -116,7 +116,7 @@ fetch(`http://localhost:3000/api/products/`)
         // eventlistener sur HTML "supprimer" pour suppression produit
 
         pDeleteItem.addEventListener("click", function (e) {
-          let res = confirm("supprimer");
+          let res = confirm("Voulez-vous supprimer l'article?");
           let article = e.target.closest("article");
 
           // Récupérer l'ID et la couleur de l'article cliqué
@@ -127,7 +127,9 @@ fetch(`http://localhost:3000/api/products/`)
           if (res) {
             // Trouver l'index de l'objet à supprimer dans le local storage
             const index = cart.findIndex(
-              (item) => item.id === articleId && item.color === articleColor
+              (item) =>
+                (item.id === articleId && item.color === articleColor) ||
+                item.quantity === eltQuantity
             );
 
             if (index >= 0) {
@@ -153,8 +155,14 @@ fetch(`http://localhost:3000/api/products/`)
         // eventlistener sur HTML l'input pour modification quantité produit
 
         eltQuantity.addEventListener("change", (e) => {
-          product.quantity = eltQuantity.value;
+          let quantity = parseInt(eltQuantity.value);
 
+          if (quantity < 0) {
+            quantity = 0;
+            alert("La quantité ne peut pas être négative");
+          }
+
+          product.quantity = quantity;
           // Met à jour le prix de l'article
           eltPrice.textContent = product.price * product.quantity + " €";
 
@@ -170,6 +178,7 @@ fetch(`http://localhost:3000/api/products/`)
       calculQuantityAndPrice(cart);
     } else {
       alert("votre panier est vide");
+      return false;
     }
 
     //regex formulaire
@@ -261,8 +270,8 @@ fetch(`http://localhost:3000/api/products/`)
       let cart = JSON.parse(localStorage.getItem("cart"));
 
       //si le panier est vide le formulaire ne sera pas valide et affiche un message
-      if (!cart || cart.length == 0) {
-        // isFormValid = false;
+
+      if (!cart || cart.length == 0 || calculQuantityAndPrice <= 0) {
         alert("votre panier est vide");
         return;
       } else {
@@ -284,7 +293,6 @@ fetch(`http://localhost:3000/api/products/`)
           };
 
           finalPost(order);
-          //console.log(order);
         } else {
           alert("Formulaire non valide");
         }
@@ -326,14 +334,12 @@ function calculQuantityAndPrice(cart) {
     totalPrice += parseInt(product.price) * parseInt(product.quantity);
   }
   let total = [totalPrice, totalQuantity];
-
   //insère les calculs de total de prix et de quantité dans l'HTML
   const eltTotalItems = document.getElementById("totalQuantity");
   eltTotalItems.textContent = total[1];
   const eltTotalPrice = document.getElementById("totalPrice");
   eltTotalPrice.textContent = total[0];
 }
-
 //permet d'envoyer au local Storage les données sans le prix
 function saveCart(cart) {
   let newCart = [];
